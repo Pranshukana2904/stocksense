@@ -1,0 +1,145 @@
+{
+  "project_name": "StockSense",
+  "theme": "dark",
+  "archetype": "Swiss & High-Contrast (Data-Heavy Dashboard Variant)",
+  "typography": {
+    "fonts": {
+      "display": "Syne",
+      "body": "Plus Jakarta Sans",
+      "mono": "JetBrains Mono"
+    },
+    "hierarchy_rules": {
+      "h1": "font-display text-4xl sm:text-5xl font-black tracking-tight text-text-primary",
+      "h2": "font-display text-2xl sm:text-3xl font-bold tracking-tight text-text-primary",
+      "h3": "font-display text-xl sm:text-2xl font-bold tracking-tight text-text-primary",
+      "h4": "font-display text-lg sm:text-xl font-bold tracking-tight text-text-primary",
+      "body": "font-body text-base text-text-secondary leading-relaxed",
+      "small": "font-body text-sm text-text-secondary",
+      "metrics": "font-mono text-3xl font-bold tracking-tighter text-text-primary",
+      "labels": "font-mono text-xs uppercase tracking-[0.2em] text-text-secondary font-medium"
+    },
+    "notes": "Syne must be used with bold/black weights and tight tracking to avoid generic look. JetBrains Mono is strictly for numbers, SKUs, inventory counts, and AI probability percentages."
+  },
+  "colors": {
+    "background": "#0D1117",
+    "surface": "#161B22",
+    "border": "#30363D",
+    "text": {
+      "primary": "#E6EDF3",
+      "secondary": "#8B949E",
+      "inverse": "#0D1117"
+    },
+    "accents": {
+      "teal": "#00D4AA",
+      "amber": "#F59E0B",
+      "red": "#EF4444",
+      "indigo": "#818CF8"
+    },
+    "states": {
+      "success_bg": "rgba(0, 212, 170, 0.1)",
+      "warning_bg": "rgba(245, 158, 11, 0.1)",
+      "critical_bg": "rgba(239, 68, 68, 0.1)",
+      "ai_bg": "rgba(129, 140, 248, 0.1)"
+    },
+    "notes": "This is a strictly Dark Theme application. Do not implement a light mode toggle. The teal accent must be used specifically for positive metrics (stock increase, healthy levels) and not as a generic primary button color unless it's a primary conversion action. Indigo is reserved purely for AI predictions and automated insights."
+  },
+  "layout_and_spacing": {
+    "sidebar": {
+      "width": "240px",
+      "behavior": "fixed left-0 top-0 h-screen overflow-y-auto border-r border-[#30363D] bg-[#0D1117]",
+      "nav_items": "Hover states must have bg-[#161B22] and text-[#E6EDF3]. Active states use a subtle indigo left-border indicator."
+    },
+    "main_content": {
+      "behavior": "ml-[240px] min-h-screen p-8 bg-[#0D1117]",
+      "grid_strategy": "Control Room Protocol. grid-cols-1 md:grid-cols-3 lg:grid-cols-4. gap-6."
+    },
+    "bento_grid": {
+      "kpi_card": "col-span-1 p-6 border border-[#30363D] bg-[#161B22] rounded-lg",
+      "chart_panel": "col-span-2 lg:col-span-3 p-6 border border-[#30363D] bg-[#161B22] rounded-lg",
+      "side_panel": "col-span-1 row-span-2 p-6 border border-[#30363D] bg-[#161B22] rounded-lg"
+    }
+  },
+  "components": {
+    "cards": {
+      "style": "Flat, sharp or max rounded-lg (8px). border border-[#30363D] bg-[#161B22].",
+      "shadows": "No diffuse shadows. Use crisp 1px borders to define hierarchy.",
+      "hover": "Slight border highlight (e.g., border-[#8B949E]/50) or subtle bg lightening. DO NOT use heavy translation (-translate-y-1) for data cards, only for interactive elements."
+    },
+    "tables": {
+      "style": "Dense data grid. border-collapse w-full text-left",
+      "header": "bg-[#0D1117] border-b border-[#30363D] text-xs font-mono uppercase tracking-wider text-[#8B949E]",
+      "rows": "border-b border-[#30363D]/50 hover:bg-[#30363D]/20 transition-colors",
+      "cells": "py-3 px-4 text-sm font-body text-[#E6EDF3]"
+    },
+    "buttons": {
+      "primary": "bg-[#E6EDF3] text-[#0D1117] hover:bg-white font-semibold rounded-md px-4 py-2 transition-colors inline-flex items-center justify-center gap-2",
+      "secondary": "bg-[#161B22] border border-[#30363D] text-[#E6EDF3] hover:bg-[#30363D] rounded-md px-4 py-2 transition-colors inline-flex items-center justify-center gap-2",
+      "ai_action": "bg-[#818CF8]/10 border border-[#818CF8]/30 text-[#818CF8] hover:bg-[#818CF8]/20 rounded-md px-4 py-2 transition-colors inline-flex items-center justify-center gap-2",
+      "destructive": "bg-[#EF4444]/10 border border-[#EF4444]/30 text-[#EF4444] hover:bg-[#EF4444]/20 rounded-md px-4 py-2 inline-flex items-center justify-center gap-2"
+    },
+    "badges": {
+      "low_stock": "bg-[#F59E0B]/10 text-[#F59E0B] border border-[#F59E0B]/20 font-mono text-xs px-2 py-0.5 rounded-full inline-flex",
+      "out_of_stock": "bg-[#EF4444]/10 text-[#EF4444] border border-[#EF4444]/20 font-mono text-xs px-2 py-0.5 rounded-full inline-flex",
+      "healthy": "bg-[#00D4AA]/10 text-[#00D4AA] border border-[#00D4AA]/20 font-mono text-xs px-2 py-0.5 rounded-full inline-flex",
+      "ai_insight": "bg-[#818CF8]/10 text-[#818CF8] border border-[#818CF8]/20 font-mono text-xs px-2 py-0.5 rounded flex items-center gap-1 w-fit"
+    },
+    "charts": {
+      "tooltip": "bg-[#161B22] border border-[#30363D] text-[#E6EDF3] rounded-lg shadow-xl p-3",
+      "grid": "stroke-[#30363D] stroke-dasharray-3",
+      "axis": "text-[#8B949E] text-xs font-mono"
+    },
+    "forms": {
+      "inputs": "bg-[#0D1117] border border-[#30363D] text-[#E6EDF3] focus:border-[#818CF8] focus:ring-1 focus:ring-[#818CF8] rounded-md px-3 py-2 w-full",
+      "labels": "text-sm font-medium text-[#8B949E] mb-1.5 block"
+    }
+  },
+  "icons": {
+    "library": "lucide-react",
+    "stroke_width": "1.5",
+    "notes": "Keep icons crisp and technical. Do not use filled icons unless representing an active/toggled state."
+  },
+  "motion_and_interaction": {
+    "transitions": "Use `transition-all duration-200 ease-in-out` for all interactive states (hover, focus, active).",
+    "focus_states": "Visible focus rings are MANDATORY for accessibility. Use `focus-visible:ring-2 focus-visible:ring-[#818CF8] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0D1117]`.",
+    "loading": "Use skeleton loaders with `animate-pulse bg-[#30363D]/50 rounded` instead of generic spinners for tables and charts."
+  },
+  "image_urls": [
+    {
+      "category": "login_background",
+      "url": "https://static.prod-images.emergentagent.com/jobs/ed841615-37b6-4660-8a51-12701ce9d1a9/images/0010bc0402e94fd45a8d1f99cef8a11f43b42bfc036e040858c16e8f647ce7f1.png",
+      "description": "Abstract dark mode architectural structure, glowing subtle indigo and teal data lines, technical precision. Use as a split-screen or full background for the Login/Register page."
+    },
+    {
+      "category": "ai_insight_texture",
+      "url": "https://static.prod-images.emergentagent.com/jobs/ed841615-37b6-4660-8a51-12701ce9d1a9/images/402cfcbf6b1f4e4a01d7246c0781de3e510573c88efd75b27f542397294871d9.png",
+      "description": "Macro close-up of a high-tech glowing amber/red warning indicator. Use as a subtle background image (with heavy opacity reduction, e.g., opacity-10) inside critical AI alert panels or prediction cards."
+    },
+    {
+      "category": "user_avatar_1",
+      "url": "https://images.unsplash.com/photo-1762522927402-f390672558d8?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzMjh8MHwxfHNlYXJjaHwxfHxwcm9mZXNzaW9uYWwlMjBjb3Jwb3JhdGUlMjBwb3J0cmFpdCUyMGhlYWRzaG90fGVufDB8fHx8MTc3NTg5MzM1M3ww&ixlib=rb-4.1.0&q=85",
+      "description": "Professional male avatar for user profile or supplier contact."
+    },
+    {
+      "category": "user_avatar_2",
+      "url": "https://images.unsplash.com/photo-1769636929261-e913ed023c83?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzMjh8MHwxfHNlYXJjaHw0fHxwcm9mZXNzaW9uYWwlMjBjb3Jwb3JhdGUlMjBwb3J0cmFpdCUyMGhlYWRzaG90fGVufDB8fHx8MTc3NTg5MzM1M3ww&ixlib=rb-4.1.0&q=85",
+      "description": "Professional avatar for user profile or supplier contact."
+    },
+    {
+      "category": "user_avatar_3",
+      "url": "https://images.unsplash.com/photo-1771898343647-bd979ad8cca5?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzMjh8MHwxfHNlYXJjaHwzfHxwcm9mZXNzaW9uYWwlMjBjb3Jwb3JhdGUlMjBwb3J0cmFpdCUyMGhlYWRzaG90fGVufDB8fHx8MTc3NTg5MzM1M3ww&ixlib=rb-4.1.0&q=85",
+      "description": "Professional avatar for user profile or supplier contact."
+    }
+  ],
+  "accessibility": {
+    "contrast": "Ensure all text, especially text-secondary (#8B949E), passes WCAG AA contrast ratios against the background (#0D1117) and surface (#161B22) colors.",
+    "testing": "All interactive and key informational elements MUST include a `data-testid` attribute (e.g., `data-testid='login-submit-button'`, `data-testid='inventory-row-123'`)."
+  },
+  "instructions_to_main_agent": [
+    "Strictly adhere to the dark theme colors provided. DO NOT introduce random grays or whites for backgrounds.",
+    "Use Shadcn UI components but strip away the default styling to match the flat, sharp, #161B22 surface / #30363D border aesthetic.",
+    "Implement the Layout's Bento Grid for the Dashboard: strictly use the column spans and 240px fixed sidebar.",
+    "Charts must use Recharts and inherit the custom colors provided in the acccents and states objects. Do NOT use default Recharts colors.",
+    "The app must not look like a generic Vercel template. Typography hierarchy is critical: use Syne font for headings, JetBrains Mono for metrics and table data, and Plus Jakarta Sans for body text.",
+    "Ensure all interactive items have the `data-testid` attribute assigned for testing."
+  ]
+}
