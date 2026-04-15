@@ -1,82 +1,55 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-    darkMode: ["class"],
-    content: [
-    "./src/**/*.{js,jsx,ts,tsx}",
-    "./public/index.html"
-  ],
+  darkMode: ["class"],
+  content: ["./src/**/*.{js,jsx,ts,tsx}", "./public/index.html"],
   theme: {
-  	extend: {
-  		borderRadius: {
-  			lg: 'var(--radius)',
-  			md: 'calc(var(--radius) - 2px)',
-  			sm: 'calc(var(--radius) - 4px)'
-  		},
-  		colors: {
-  			background: 'hsl(var(--background))',
-  			foreground: 'hsl(var(--foreground))',
-  			card: {
-  				DEFAULT: 'hsl(var(--card))',
-  				foreground: 'hsl(var(--card-foreground))'
-  			},
-  			popover: {
-  				DEFAULT: 'hsl(var(--popover))',
-  				foreground: 'hsl(var(--popover-foreground))'
-  			},
-  			primary: {
-  				DEFAULT: 'hsl(var(--primary))',
-  				foreground: 'hsl(var(--primary-foreground))'
-  			},
-  			secondary: {
-  				DEFAULT: 'hsl(var(--secondary))',
-  				foreground: 'hsl(var(--secondary-foreground))'
-  			},
-  			muted: {
-  				DEFAULT: 'hsl(var(--muted))',
-  				foreground: 'hsl(var(--muted-foreground))'
-  			},
-  			accent: {
-  				DEFAULT: 'hsl(var(--accent))',
-  				foreground: 'hsl(var(--accent-foreground))'
-  			},
-  			destructive: {
-  				DEFAULT: 'hsl(var(--destructive))',
-  				foreground: 'hsl(var(--destructive-foreground))'
-  			},
-  			border: 'hsl(var(--border))',
-  			input: 'hsl(var(--input))',
-  			ring: 'hsl(var(--ring))',
-  			chart: {
-  				'1': 'hsl(var(--chart-1))',
-  				'2': 'hsl(var(--chart-2))',
-  				'3': 'hsl(var(--chart-3))',
-  				'4': 'hsl(var(--chart-4))',
-  				'5': 'hsl(var(--chart-5))'
-  			}
-  		},
-  		keyframes: {
-  			'accordion-down': {
-  				from: {
-  					height: '0'
-  				},
-  				to: {
-  					height: 'var(--radix-accordion-content-height)'
-  				}
-  			},
-  			'accordion-up': {
-  				from: {
-  					height: 'var(--radix-accordion-content-height)'
-  				},
-  				to: {
-  					height: '0'
-  				}
-  			}
-  		},
-  		animation: {
-  			'accordion-down': 'accordion-down 0.2s ease-out',
-  			'accordion-up': 'accordion-up 0.2s ease-out'
-  		}
-  	}
+    extend: {
+      colors: {
+        background: "#0D1117",
+        surface: "#161B22",
+        "border-color": "#30363D",
+        "text-primary": "#E6EDF3",
+        "text-secondary": "#8B949E",
+        "accent-teal": "#00D4AA",
+        "accent-amber": "#F59E0B",
+        "accent-red": "#EF4444",
+        "accent-indigo": "#818CF8",
+        border: "#30363D",
+        foreground: "#E6EDF3",
+        card: { DEFAULT: "#161B22", foreground: "#E6EDF3" },
+        popover: { DEFAULT: "#161B22", foreground: "#E6EDF3" },
+        primary: { DEFAULT: "#E6EDF3", foreground: "#0D1117" },
+        secondary: { DEFAULT: "#161B22", foreground: "#E6EDF3" },
+        muted: { DEFAULT: "#30363D", foreground: "#8B949E" },
+        accent: { DEFAULT: "#00D4AA", foreground: "#0D1117" },
+        destructive: { DEFAULT: "#EF4444", foreground: "#E6EDF3" },
+        input: "#30363D",
+        ring: "#818CF8",
+      },
+      fontFamily: {
+        display: ["Syne", "sans-serif"],
+        body: ["Plus Jakarta Sans", "sans-serif"],
+        mono: ["JetBrains Mono", "monospace"],
+        sans: ["Plus Jakarta Sans", "sans-serif"],
+      },
+      borderRadius: {
+        lg: "0.75rem",
+        md: "0.5rem",
+        sm: "0.375rem",
+      },
+      keyframes: {
+        "accordion-down": { from: { height: "0" }, to: { height: "var(--radix-accordion-content-height)" } },
+        "accordion-up": { from: { height: "var(--radix-accordion-content-height)" }, to: { height: "0" } },
+        "fade-in": { from: { opacity: "0", transform: "translateY(8px)" }, to: { opacity: "1", transform: "translateY(0)" } },
+        "pulse-glow": { "0%, 100%": { boxShadow: "0 0 0 0 rgba(0,212,170,0)" }, "50%": { boxShadow: "0 0 0 4px rgba(0,212,170,0.2)" } },
+      },
+      animation: {
+        "accordion-down": "accordion-down 0.2s ease-out",
+        "accordion-up": "accordion-up 0.2s ease-out",
+        "fade-in": "fade-in 0.3s ease-out",
+        "pulse-glow": "pulse-glow 2s infinite",
+      },
+    },
   },
   plugins: [require("tailwindcss-animate")],
 };

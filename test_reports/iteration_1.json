@@ -1,0 +1,66 @@
+{
+  "summary": "Full e2e testing of StockSense - 19 backend tests all pass. Frontend tested across all pages. Most features work correctly. Found 1 critical bug (Predicted Revenue always ₹0 due to field name mismatch) and a few minor issues.",
+  "backend_issues": {
+    "critical": [],
+    "minor": [
+      {
+        "endpoint": "/api/predictions",
+        "issue": "Field name inconsistency: cache returns 'predicted_demand' but run_prediction returns 'total_predicted_demand' via **pred spread. Frontend uses p.total_predicted_demand which is undefined when reading from cache.",
+        "priority": "HIGH"
+      }
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [
+      {
+        "component": "Dashboard - KPI Predicted Revenue",
+        "issue": "Always shows ₹0 because Dashboard.js uses p.total_predicted_demand but API returns p.predicted_demand (from cache). Fix: change Dashboard.js line 110 to use (p.predicted_demand || p.total_predicted_demand || 0)",
+        "selector": "[data-testid='kpi-predicted-revenue']",
+        "priority": "HIGH"
+      },
+      {
+        "component": "Dashboard - Revenue Trend (14d)",
+        "issue": "Chart appears almost empty/sparse. Only shows bars for days with recent sales activity. Not a bug per se, but low visual impact.",
+        "selector": "[data-testid='revenue-trend-chart']",
+        "priority": "LOW"
+      }
+    ],
+    "integration_issues": [],
+    "design_issues": [
+      {
+        "screen": "Dashboard - Sales Forecast",
+        "issues": ["Historical data line appears flat at 0 for most of the visible range; predicted data (dashed) shows future values. This is expected for 30D/90D range when data is sparse."]
+      }
+    ]
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_stocksense.py",
+    "/app/test_reports/pytest/pytest_results.xml"
+  ],
+  "action_items": [
+    "Fix Predicted Revenue KPI: in backend server.py line 630, rename the field stored in cache from 'predicted_demand' to 'total_predicted_demand' OR fix frontend Dashboard.js line 110 to use (p.predicted_demand || p.total_predicted_demand || 0). Root cause: Backend stores cache as 'predicted_demand' but run_prediction() returns 'total_predicted_demand' -- inconsistent naming.",
+    "AI Insights panel loads correctly (5 insights from GPT-4o) but loads after page render - verify UX shows loading spinner"
+  ],
+  "critical_code_review_comments": [
+    "server.py line 630: prediction_cache stores 'predicted_demand' but run_prediction() returns dict with key 'total_predicted_demand'. The **pred spread on line 650 (non-cached path) uses 'total_predicted_demand', but cached path (line 630) returns 'predicted_demand'. This inconsistency causes frontend to always get 0 predicted revenue when cache is populated.",
+    "Dashboard URL is at root '/' not '/dashboard' - wait_for_url tests expecting **/dashboard** will fail (minor test concern).",
+    "server.py is 713 lines - consider splitting into separate route modules for maintainability."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_stocksense.py"
+  ],
+  "success_rate": {
+    "backend": "100% (19/19 tests passing)",
+    "frontend": "90% (most features work; Predicted Revenue ₹0 is visible bug)"
+  },
+  "test_credentials": "admin@stocksense.com / Admin@123 (ADMIN role)",
+  "seed_data_creation": "Created 2 test products via API: TEST_Product_Widget (TEST-SKU-001), TEST_UpdateProduct (TEST-SKU-002). Created 1 test supplier: TEST_Supplier.",
+  "retest_needed": true,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Backend all passing. Dashboard loads at root '/' not '/dashboard'. Main bug is Predicted Revenue KPI showing ₹0. All other pages (Inventory, Alerts, Predictions, Sales, Suppliers, Categories, Settings) work correctly. AI Insights API works and returns 5 insights. Inventory table loads 20+ products with all required columns.",
+  "rca_of_issue": {
+    "bug": "Predicted Revenue shows ₹0",
+    "root_cause": "In /api/predictions endpoint, when prediction_cache exists, it returns 'predicted_demand' (line 630). But when cache is absent, run_prediction() spreads its result which has key 'total_predicted_demand' (line 650). Frontend Dashboard.js line 110 exclusively uses p.total_predicted_demand. Since cache is populated after first load, subsequent loads always use cached 'predicted_demand' which is undefined in frontend. Result: 0 * selling_price = 0.",
+    "fix": "Option 1: In server.py line 630, change 'predicted_demand': cache.get('predicted_demand', 0) to 'total_predicted_demand': cache.get('predicted_demand', 0). Option 2: Fix Dashboard.js to use (p.total_predicted_demand || p.predicted_demand || 0)."
+  }
+}
