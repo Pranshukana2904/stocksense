@@ -349,7 +349,7 @@ async def enrich_product(p: dict) -> dict:
             "created_at": p.get("created_at"), "updated_at": p.get("updated_at")}
 
 @prod_r.get("")
-async def list_products(page: int = Query(1, ge=1), limit: int = Query(20, ge=1, le=100),
+async def list_products(page: int = Query(1, ge=1), limit: int = Query(20, ge=1, le=200),
                         search: Optional[str] = None, category_id: Optional[str] = None,
                         stock_status: Optional[str] = None, user=Depends(auth)):
     q = {}
@@ -501,7 +501,7 @@ async def record_sale(data: SaleIn, user=Depends(auth)):
     return ok(sdoc, "Sale recorded")
 
 @sale_r.get("")
-async def list_sales(page: int = Query(1, ge=1), limit: int = Query(20, ge=1, le=100),
+async def list_sales(page: int = Query(1, ge=1), limit: int = Query(20, ge=1, le=5000),
                      product_id: Optional[str] = None, start_date: Optional[str] = None,
                      end_date: Optional[str] = None, user=Depends(auth)):
     q = {}
@@ -627,6 +627,7 @@ async def all_predictions(user=Depends(auth)):
             result.append({"product_id": pid, "product_name": p["name"],
                            "product_image": p.get("image_url"), "current_stock": p["current_stock"],
                            "selling_price": p.get("selling_price", 0),
+                           "total_predicted_demand": cache.get("predicted_demand", 0),
                            "predicted_demand": cache.get("predicted_demand", 0),
                            "confidence_score": cache.get("confidence_score", 0),
                            "days_until_stockout": cache.get("days_until_stockout", 999),

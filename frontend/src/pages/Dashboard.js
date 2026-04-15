@@ -62,7 +62,7 @@ const Dashboard = () => {
     queryFn: async () => {
       const startDate = new Date();
       startDate.setDate(startDate.getDate() - timeRange);
-      const res = await salesApi.list({ start_date: startDate.toISOString().slice(0, 10), limit: 1000 });
+      const res = await salesApi.list({ start_date: startDate.toISOString().slice(0, 10), limit: 5000 });
       return res.data.data || [];
     },
   });
@@ -107,7 +107,7 @@ const Dashboard = () => {
   }, [salesData]);
 
   const predictedMonthlyRevenue = predictions.reduce((sum, p) => {
-    return sum + (p.total_predicted_demand || 0) * (p.selling_price || 0);
+    return sum + ((p.total_predicted_demand || p.predicted_demand || 0)) * (p.selling_price || 0);
   }, 0);
 
   const lowStockAlerts = alertsList.filter(a => a.type === 'LOW_STOCK').slice(0, 5);
@@ -115,10 +115,9 @@ const Dashboard = () => {
   const fetchInsights = async () => {
     setInsightsLoading(true);
     try {
-      const { default: { predictionsApi: pApi } } = await import('../api/api');
-      const { predictionsApi: api2 } = await import('../api/api');
-      const res = await api2.insights();
+      const res = await predictionsApi.insights();
       setInsights(res.data.data || []);
+      toast.success('Insights refreshed');
     } catch {
       toast.error('Failed to fetch AI insights');
     } finally {

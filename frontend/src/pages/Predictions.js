@@ -152,7 +152,7 @@ const Predictions = () => {
                     </div>
                     <div className="bg-[#0D1117] rounded-lg p-2.5 border border-[#30363D]">
                       <p className="text-[#8B949E] text-xs font-mono">Predicted (30d)</p>
-                      <p className="font-mono font-bold text-[#818CF8] text-base">{item.predicted_demand}</p>
+                      <p className="font-mono font-bold text-[#818CF8] text-base">{item.total_predicted_demand || item.predicted_demand}</p>
                     </div>
                   </div>
                   <div className="flex justify-between items-center">
