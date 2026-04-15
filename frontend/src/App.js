@@ -10,6 +10,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Layout from './components/Layout';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import AuthCallback from './pages/AuthCallback';
 import Dashboard from './pages/Dashboard';
 import Inventory from './pages/Inventory';
 import Alerts from './pages/Alerts';
@@ -58,6 +59,7 @@ function App() {
           <Routes>
             <Route path="/login" element={accessToken ? <Navigate to="/" replace /> : <Login />} />
             <Route path="/register" element={accessToken ? <Navigate to="/" replace /> : <Register />} />
+            <Route path="/auth/callback" element={<AuthCallback />} />
             <Route element={<ProtectedRoute />}>
               <Route element={<Layout />}>
                 <Route path="/" element={<Dashboard />} />

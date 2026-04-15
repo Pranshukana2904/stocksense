@@ -199,6 +199,10 @@ class PasswordChange(BaseModel):
 class GoogleAuthIn(BaseModel):
     credential: str
 
+class GoogleCodeIn(BaseModel):
+    code: str
+    redirect_uri: str
+
 # ─────────────────────────── AUTH ROUTER ───────────────────────────
 
 auth_r = APIRouter(prefix="/api/auth", tags=["auth"])
@@ -265,6 +269,58 @@ async def google_auth(data: GoogleAuthIn, response: Response):
     email = idinfo.get("email", "")
     name = idinfo.get("name", email)
     picture = idinfo.get("picture", "")
+
+    u = await db.users.find_one({"email": email})
+    if u:
+        uid = u["_id"]
+        role = u["role"]
+        await db.users.update_one({"_id": uid}, {"$set": {"picture": picture, "updated_at": datetime.now(timezone.utc).isoformat()}})
+    else:
+        uid = str(uuid.uuid4())
+        role = "STAFF"
+        await db.users.insert_one({
+            "_id": uid, "name": name, "email": email,
+            "password": "", "role": role, "picture": picture,
+            "auth_provider": "google",
+            "created_at": datetime.now(timezone.utc).isoformat(),
+            "updated_at": datetime.now(timezone.utc).isoformat()
+        })
+
+    at = make_access(uid, role)
+    rt = make_refresh(uid)
+    response.set_cookie("refresh_token", rt, httponly=True, max_age=7*86400, samesite="lax")
+    return ok({"access_token": at, "user": {"id": uid, "name": name, "email": email, "role": role, "picture": picture}}, "Google login successful")
+
+@auth_r.post("/google/callback")
+async def google_callback(data: GoogleCodeIn, response: Response):
+    import httpx
+    # Exchange authorization code for tokens
+    async with httpx.AsyncClient() as client:
+        token_res = await client.post(
+            "https://oauth2.googleapis.com/token",
+            data={
+                "code": data.code,
+                "client_id": GOOGLE_CLIENT_ID,
+                "client_secret": os.environ.get("GOOGLE_CLIENT_SECRET", ""),
+                "redirect_uri": data.redirect_uri,
+                "grant_type": "authorization_code",
+            },
+        )
+    tokens = token_res.json()
+    if "error" in tokens:
+        err(f"Token exchange failed: {tokens.get('error_description', tokens['error'])}", 401)
+
+    # Get user info using the access token
+    async with httpx.AsyncClient() as client:
+        userinfo_res = await client.get(
+            "https://www.googleapis.com/oauth2/v3/userinfo",
+            headers={"Authorization": f"Bearer {tokens['access_token']}"},
+        )
+    userinfo = userinfo_res.json()
+
+    email = userinfo.get("email", "")
+    name = userinfo.get("name", email)
+    picture = userinfo.get("picture", "")
 
     u = await db.users.find_one({"email": email})
     if u:
