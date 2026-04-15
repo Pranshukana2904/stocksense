@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Package, Eye, EyeOff, ArrowRight } from 'lucide-react';
+import { GoogleLogin } from '@react-oauth/google';
 import { authApi } from '../api/api';
 import useAuthStore from '../store/authStore';
 import { toast } from 'sonner';
+import axios from 'axios';
 
 const Login = () => {
   const [form, setForm] = useState({ email: '', password: '' });
@@ -27,6 +29,22 @@ const Login = () => {
       toast.error(err.response?.data?.detail || 'Login failed');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleGoogleSuccess = async (credentialResponse) => {
+    try {
+      const res = await axios.post(
+        `${process.env.REACT_APP_BACKEND_URL}/api/auth/google`,
+        { credential: credentialResponse.credential }
+      );
+      const { access_token, user } = res.data.data;
+      setToken(access_token);
+      setUser(user);
+      toast.success(`Welcome, ${user.name}!`);
+      navigate('/');
+    } catch (err) {
+      toast.error(err.response?.data?.detail || 'Google sign-in failed');
     }
   };
 
@@ -129,6 +147,29 @@ const Login = () => {
               )}
             </button>
           </form>
+
+          {/* Divider */}
+          <div className="relative my-5">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-[#30363D]" />
+            </div>
+            <div className="relative flex justify-center text-xs">
+              <span className="px-3 bg-[#0D1117] text-[#8B949E] font-body">or continue with</span>
+            </div>
+          </div>
+
+          {/* Google Sign-In */}
+          <div data-testid="google-login-btn" className="flex justify-center">
+            <GoogleLogin
+              onSuccess={handleGoogleSuccess}
+              onError={() => toast.error('Google sign-in failed. Please try again.')}
+              theme="filled_black"
+              size="large"
+              width="380"
+              text="signin_with"
+              shape="rectangular"
+            />
+          </div>
 
           <div className="mt-4 p-4 bg-[#161B22] rounded-lg border border-[#30363D]">
             <p className="text-[#8B949E] text-xs font-mono mb-2">Demo credentials:</p>

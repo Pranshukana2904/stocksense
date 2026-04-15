@@ -21,6 +21,7 @@ DB_NAME = os.environ["DB_NAME"]
 JWT_ACCESS_SECRET = os.environ.get("JWT_ACCESS_SECRET", "stocksense_access_secret_key_minimum_64_characters_abcdefghijklmno")
 JWT_REFRESH_SECRET = os.environ.get("JWT_REFRESH_SECRET", "stocksense_refresh_secret_key_minimum_64_characters_abcdefghijklmno")
 EMERGENT_LLM_KEY = os.environ.get("EMERGENT_LLM_KEY", "")
+GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID", "")
 
 mongo_client = AsyncIOMotorClient(MONGO_URL)
 db = mongo_client[DB_NAME]
@@ -195,6 +196,9 @@ class UserUpdate(BaseModel):
 class PasswordChange(BaseModel):
     current_password: str; new_password: str
 
+class GoogleAuthIn(BaseModel):
+    credential: str
+
 # ─────────────────────────── AUTH ROUTER ───────────────────────────
 
 auth_r = APIRouter(prefix="/api/auth", tags=["auth"])
@@ -244,6 +248,44 @@ async def refresh(request: Request, response: Response):
 async def logout(response: Response):
     response.delete_cookie("refresh_token")
     return ok(None, "Logged out")
+
+@auth_r.post("/google")
+async def google_auth(data: GoogleAuthIn, response: Response):
+    from google.oauth2 import id_token
+    from google.auth.transport import requests as google_requests
+    try:
+        idinfo = id_token.verify_oauth2_token(
+            data.credential,
+            google_requests.Request(),
+            GOOGLE_CLIENT_ID
+        )
+    except ValueError as e:
+        err(f"Invalid Google token: {str(e)}", 401)
+
+    email = idinfo.get("email", "")
+    name = idinfo.get("name", email)
+    picture = idinfo.get("picture", "")
+
+    u = await db.users.find_one({"email": email})
+    if u:
+        uid = u["_id"]
+        role = u["role"]
+        await db.users.update_one({"_id": uid}, {"$set": {"picture": picture, "updated_at": datetime.now(timezone.utc).isoformat()}})
+    else:
+        uid = str(uuid.uuid4())
+        role = "STAFF"
+        await db.users.insert_one({
+            "_id": uid, "name": name, "email": email,
+            "password": "", "role": role, "picture": picture,
+            "auth_provider": "google",
+            "created_at": datetime.now(timezone.utc).isoformat(),
+            "updated_at": datetime.now(timezone.utc).isoformat()
+        })
+
+    at = make_access(uid, role)
+    rt = make_refresh(uid)
+    response.set_cookie("refresh_token", rt, httponly=True, max_age=7*86400, samesite="lax")
+    return ok({"access_token": at, "user": {"id": uid, "name": name, "email": email, "role": role, "picture": picture}}, "Google login successful")
 
 @auth_r.get("/me")
 async def me(user=Depends(auth)):

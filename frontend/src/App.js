@@ -3,6 +3,7 @@ import './App.css';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'sonner';
+import { GoogleOAuthProvider } from '@react-oauth/google';
 import useAuthStore from './store/authStore';
 import useAlertStore from './store/alertStore';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -48,29 +49,32 @@ function App() {
   const { accessToken } = useAuthStore();
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <Toaster position="bottom-right" richColors theme="dark" />
-        <AlertPoller />
-        <Routes>
-          <Route path="/login" element={accessToken ? <Navigate to="/" replace /> : <Login />} />
-          <Route path="/register" element={accessToken ? <Navigate to="/" replace /> : <Register />} />
-          <Route element={<ProtectedRoute />}>
-            <Route element={<Layout />}>
-              <Route path="/" element={<Dashboard />} />
-              <Route path="/inventory" element={<Inventory />} />
-              <Route path="/alerts" element={<Alerts />} />
-              <Route path="/predictions" element={<Predictions />} />
-              <Route path="/sales" element={<Sales />} />
-              <Route path="/suppliers" element={<Suppliers />} />
-              <Route path="/categories" element={<Categories />} />
-              <Route path="/settings" element={<Settings />} />
+    // REMINDER: DO NOT HARDCODE THE URL, OR ADD ANY FALLBACKS OR REDIRECT URLS, THIS BREAKS THE AUTH
+    <GoogleOAuthProvider clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID}>
+      <QueryClientProvider client={queryClient}>
+        <BrowserRouter>
+          <Toaster position="bottom-right" richColors theme="dark" />
+          <AlertPoller />
+          <Routes>
+            <Route path="/login" element={accessToken ? <Navigate to="/" replace /> : <Login />} />
+            <Route path="/register" element={accessToken ? <Navigate to="/" replace /> : <Register />} />
+            <Route element={<ProtectedRoute />}>
+              <Route element={<Layout />}>
+                <Route path="/" element={<Dashboard />} />
+                <Route path="/inventory" element={<Inventory />} />
+                <Route path="/alerts" element={<Alerts />} />
+                <Route path="/predictions" element={<Predictions />} />
+                <Route path="/sales" element={<Sales />} />
+                <Route path="/suppliers" element={<Suppliers />} />
+                <Route path="/categories" element={<Categories />} />
+                <Route path="/settings" element={<Settings />} />
+              </Route>
             </Route>
-          </Route>
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      </BrowserRouter>
-    </QueryClientProvider>
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </BrowserRouter>
+      </QueryClientProvider>
+    </GoogleOAuthProvider>
   );
 }
 
