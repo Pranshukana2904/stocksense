@@ -688,15 +688,20 @@ async def ai_insights(user=Depends(auth)):
     if EMERGENT_LLM_KEY:
         try:
             import json
-            from emergentintegrations.llm.chat import LlmChat, UserMessage
-            chat = LlmChat(api_key=EMERGENT_LLM_KEY, session_id=str(uuid.uuid4()),
-                           system_message="You are a business intelligence analyst for an inventory management system. Always respond with valid JSON only."
-                           ).with_model("openai", "gpt-4o")
-            resp = await chat.send_message(UserMessage(text=f"""
-Based on this inventory data, provide exactly 5 actionable business insights as a JSON array.
+            from openai import AsyncOpenAI
+            client = AsyncOpenAI(api_key=EMERGENT_LLM_KEY)
+            response = await client.chat.completions.create(
+                model="gpt-4o",
+                messages=[
+                    {"role": "system", "content": "You are a business intelligence analyst for an inventory management system. Always respond with valid JSON only."},
+                    {"role": "user", "content": f"""Based on this inventory data, provide exactly 5 actionable business insights as a JSON array.
 {summary}
 Return ONLY a valid JSON array. Each item must have: "title" (string), "description" (2-3 sentences), "severity" ("info"|"warning"|"critical"), "affectedProduct" (string).
-"""))
+"""}
+                ],
+                temperature=0.7,
+            )
+            resp = response.choices[0].message.content or ""
             clean = resp.strip().lstrip("```json").lstrip("```").rstrip("```").strip()
             insights = json.loads(clean)
             if isinstance(insights, list) and len(insights) >= 1:
